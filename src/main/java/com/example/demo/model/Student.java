@@ -3,12 +3,12 @@ package com.example.demo.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.extern.log4j.Log4j;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.time.LocalDate;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by 1 on 25.07.2017.
@@ -35,8 +35,7 @@ public class Student {
     private Double grade;
 
     @Column(name = "BIRTH_DATE", nullable = false)
-    @Temporal(TemporalType.DATE)
-    private java.util.Date date;
+    private LocalDate date;
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
     private Set<Subject> subjects = new HashSet<>();

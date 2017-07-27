@@ -25,15 +25,17 @@ public class StudentDTO {
         this.id = student.getId();
         this.name = student.getName();
         this.surname = student.getSurname();
-        this.grade = getAverage(student.getSubjects());
+        this.grade = getAverage(student);
         this.date = student.getDate().toString();
     }
 
-    private Double getAverage(Set<Subject> subjects){
+    private Double getAverage(Student student){
+        Set<Subject> subjects = student.getSubjects();
         double sum = 0;
 
-        if(subjects.isEmpty())
-            return 0.0;
+        if(subjects.isEmpty())  {
+            return student.getGrade(); // consider returning current grade, `cause I'm confused when sending some grade and getting 0.0 if there're no subjects
+        }
 
         for(Subject subject : subjects){
             sum += subject.getGrade();

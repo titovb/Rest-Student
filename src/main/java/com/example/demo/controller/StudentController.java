@@ -27,7 +27,7 @@ public class StudentController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/add")
     public StudentDTO addStudent(@RequestBody StudentDTO dto){
-        log.info("STUDENT - POST request: to add new student");
+        log.info("STUDENT - POST request: to add new student: " + dto);
         return service.addStudent(dto);
     }
 
@@ -45,14 +45,14 @@ public class StudentController {
 
     @RequestMapping(method = RequestMethod.PUT, value = "/update")
     public StudentDTO updateStudent(@RequestBody StudentDTO dto){
-        log.info("STUDENT - PUT request: to update student");
+        log.info("STUDENT - PUT request: to update student"); // I recommend to an ID to log
         return service.updateStudent(dto);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/get/{id}")
     public StudentDTO getStudent(@PathVariable Long id){
-        log.info("STUDENT - GET request: to get one student");
-        return service.getStudent(id);
+        log.info("STUDENT - GET request: to get one student"); // I recommend to an ID to log
+        return service.getStudent(id); // I recommend to name the method as getStudentById
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/names")
@@ -64,9 +64,11 @@ public class StudentController {
     @RequestMapping(method = RequestMethod.GET, value = "/getBySurname/{surname}")
     public List<StudentDTO> findBySurname(@PathVariable String surname){
         log.info("STUDENT - GET request: to find students by surname");
-        return service.findBySurname(surname);
+        return service.findBySurname(surname); // it searches without ignoring word case (Smith, but not smith). Bug or feature? :)
     }
 
+
+    // what means "best"? According to "Clean Code" a better name may be the "getStudentsWithAverageOver4" or add a comment with explaining otherwise
     @RequestMapping(method = RequestMethod.GET, value = "/get/best")
     public List<StudentDTO> getBestStudents(){
         log.info("STUDENT - GET request: to get best students");

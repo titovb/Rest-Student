@@ -10,7 +10,10 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,9 +32,9 @@ public class StudentService {
         return dao.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
-    public List<StudentDTO> addStudents(List<StudentDTO> dtos){
+    public List<StudentDTO> addStudents(List<StudentDTO> dtos) {
         List<StudentDTO> savedList = new ArrayList<>();
-        for(StudentDTO dto : dtos){
+        for (StudentDTO dto : dtos) {
             savedList.add(addStudent(dto));
         }
         return savedList;
@@ -61,7 +64,9 @@ public class StudentService {
     }
 
     public List<StudentDTO> findBySurname(String surname) {
-        return dao.findBySurname(surname).stream().map(this::convertToDTO).collect(Collectors.toList());
+        List<StudentDTO> studentDTOs = dao.findBySurname(surname).stream().map(this::convertToDTO).collect(Collectors.toList());
+        log.info("Founded [" + studentDTOs.size() + "] students with [" + surname + "] surname");
+        return studentDTOs;
     }
 
     public List<StudentDTO> getBestStudents() {
@@ -76,24 +81,30 @@ public class StudentService {
         Student student = new Student();
         student.setName(dto.getName());
         student.setSurname(dto.getSurname());
+        log.info(dto.getGrade());
         student.setGrade(dto.getGrade());
-        student.setDate(dateParse(dto.getDate()));
+        student.setDate(LocalDate.parse(dto.getDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd"))); // You may try this solution. From next Monday I can help u to use LocalDate from Java 8
         return student;
     }
-      private java.util.Date dateParse(String date){
+
+    private java.util.Date dateParse(String date) {
         java.util.Date result = null;
         try {
-             result = new SimpleDateFormat("dd.MM.yyyy").parse(date);
-        }catch(ParseException ex){
+            result = new SimpleDateFormat("dd.MM.yyyy").parse(date);
+        } catch (ParseException ex) {
             log.info("Exception in StudentService in method dateParse:\n " + ex.getMessage());
         }
         return result;
-      }
+    }
+
     private List<StudentDTO> convertAllToDTO(List<Student> students) {
         List<StudentDTO> dtos = new ArrayList<>();
         for (int i = 0; i < students.size(); i++) {
             dtos.add(convertToDTO(students.get(i)));
         }
         return dtos;
+
+        /** try to use this way :) */
+        // return students.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 }
