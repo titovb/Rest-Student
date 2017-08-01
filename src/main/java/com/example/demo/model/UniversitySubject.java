@@ -5,25 +5,26 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
+/**
+ * Created by 1 on 30.07.2017.
+ */
 @Entity
-@Table(name = "SUBJECT")
+@Table(name = "UNIVERSITY_SUBJECT")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Subject {
+public class UniversitySubject {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false, unique = true)
     private Long id;
 
-    @Column(name = "NAME", nullable = false)
+    @Column(name = "NAME", nullable = false, unique = true)
     private String name;
 
-    @Column(name = "GRADE", nullable = false)
-    private Double grade;
-
-    @ManyToOne
-    @JoinColumn(name = "STUDENT_id")
-    private Student student;
+    @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL)
+    private List<Grade> grades;
 }

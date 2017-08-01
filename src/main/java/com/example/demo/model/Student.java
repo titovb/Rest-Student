@@ -6,9 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 /**
  * Created by 1 on 25.07.2017.
@@ -31,18 +29,24 @@ public class Student {
     @Column(name = "SURNAME", nullable = false)
     private String surname;
 
-    @Column(name = "GRADE")
-    private Double grade;
+    @Column(name = "AVERAGE_GRADE")
+    private Double averageGrade = 0.0;
 
     @Column(name = "BIRTH_DATE", nullable = false)
-    private LocalDate date;
+    private LocalDate birthDate;
+
+    @ManyToOne
+    @JoinColumn(name = "GROUP_ID", nullable = false)
+    private Group group;
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
-    private Set<Subject> subjects = new HashSet<>();
+    private List<Grade> grades;
 
-    public void setSubjects(Set<Subject> subjects){
-        if(subjects!=null){
-            this.subjects = subjects;
+    public void calculateAverageGrade(){
+        double sum = 0.0;
+        for(Grade grade : grades){
+            sum+=grade.getValue();
         }
+        averageGrade = sum/grades.size();
     }
 }

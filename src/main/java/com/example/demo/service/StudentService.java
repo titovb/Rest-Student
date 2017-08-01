@@ -1,20 +1,21 @@
 package com.example.demo.service;
 
+import com.example.demo.dao.GroupDAO;
 import com.example.demo.dao.StudentDAO;
 import com.example.demo.dto.StudentDTO;
+import com.example.demo.model.Grade;
+import com.example.demo.model.Group;
 import com.example.demo.model.Student;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -28,8 +29,28 @@ public class StudentService {
     @Autowired
     private StudentDAO dao;
 
-    public List<StudentDTO> getStudents() {
-        return dao.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
+    @Autowired
+    private GroupDAO groupDAO;
+
+    @Autowired
+    private GradeService gradeService;
+
+    public List<StudentDTO> getAllStudents() {
+        List<StudentDTO> result = dao.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
+        log.info("StudentService - getStudents: got [" + result.size() + "] students");
+        return result;
+    }
+
+    public StudentDTO getStudentById(Long id) {
+        Student founded = dao.findOne(id);
+        log.info("StudentService - getStudentById: got student with id=[" + id +"]");
+        return convertToDTO(founded);
+    }
+
+    public List<StudentDTO> getStudentsByGroupId(Long groupId) {
+        List<StudentDTO> result = convertAllToDTO(groupDAO.findOne(groupId).getStudents());
+        log.info("StudentService - getStudentsByGroupId: got [" + result.size() + "] students from group with id=[" + groupId + "]");
+        return result;
     }
 
     public List<StudentDTO> addStudents(List<StudentDTO> dtos) {
@@ -37,40 +58,43 @@ public class StudentService {
         for (StudentDTO dto : dtos) {
             savedList.add(addStudent(dto));
         }
+        log.info("StudentService - addStudents: added [" + savedList.size() + "] new students");
         return savedList;
     }
 
     public StudentDTO addStudent(StudentDTO dto) {
-        Student saved = dao.save(convertToEntity(dto));
-        return convertToDTO(saved);
+        Group group = groupDAO.findOne(dto.getGroup_id());
+        Student saved = null;
+        if(group.canAddStudent()) {
+            saved = dao.save(convertToEntity(dto));
+            group.incrementCurrentQuantityOfStudents();
+            log.info("StudentService - addStudent: added new student " + convertToDTO(saved));
+            return convertToDTO(saved);
+        }
+        else{
+            log.info("StudentService - addStudent: can't add student " + dto + "to group with id=[" + group.getId() + "] - overload");
+            return null;
+        }
     }
 
     public StudentDTO updateStudent(StudentDTO dto) {
         Student saved = dao.save(convertToEntity(dto));
+        log.info("StudentService - updateStudent: updated student with id = [" + saved.getId() + "]");
         return convertToDTO(saved);
     }
 
     public void deleteStudent(Long id) {
+        Student student = dao.findOne(id);
+        Group group = groupDAO.findOne(student.getGroup().getId());
+        List<Grade> grades = student.getGrades();
+        for(int i=0;i<grades.size();i++){
+            gradeService.deleteGrade(grades.get(i).getId());
+        }
         dao.delete(id);
-    }
-
-    public StudentDTO getStudent(Long id) {
-        Student founded = dao.findOne(id);
-        return convertToDTO(founded);
-    }
-
-    public List<String> getNames() {
-        return dao.getNames();
-    }
-
-    public List<StudentDTO> findBySurname(String surname) {
-        List<StudentDTO> studentDTOs = dao.findBySurname(surname).stream().map(this::convertToDTO).collect(Collectors.toList());
-        log.info("Founded [" + studentDTOs.size() + "] students with [" + surname + "] surname");
-        return studentDTOs;
-    }
-
-    public List<StudentDTO> getBestStudents() {
-        return convertAllToDTO(dao.getBestStudents());
+        if(group!=null) {
+            group.decrementCurrentQuantityOfStudents();
+        }
+        log.info("StudentService - deleteStudent: deleted student with id=[" + id + "]");
     }
 
     private StudentDTO convertToDTO(Student student) {
@@ -81,20 +105,10 @@ public class StudentService {
         Student student = new Student();
         student.setName(dto.getName());
         student.setSurname(dto.getSurname());
-        log.info(dto.getGrade());
-        student.setGrade(dto.getGrade());
-        student.setDate(LocalDate.parse(dto.getDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd"))); // You may try this solution. From next Monday I can help u to use LocalDate from Java 8
+        student.setAverageGrade(dto.getAverageGrade());
+        student.setBirthDate(LocalDate.parse(dto.getBirthDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd"))); // You may try this solution. From next Monday I can help u to use LocalDate from Java 8
+        student.setGroup(groupDAO.findOne(dto.getGroup_id()));
         return student;
-    }
-
-    private java.util.Date dateParse(String date) {
-        java.util.Date result = null;
-        try {
-            result = new SimpleDateFormat("dd.MM.yyyy").parse(date);
-        } catch (ParseException ex) {
-            log.info("Exception in StudentService in method dateParse:\n " + ex.getMessage());
-        }
-        return result;
     }
 
     private List<StudentDTO> convertAllToDTO(List<Student> students) {
