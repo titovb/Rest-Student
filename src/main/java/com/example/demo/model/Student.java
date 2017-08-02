@@ -14,7 +14,6 @@ import java.util.List;
 @Entity
 @Table(name = "STUDENT")
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 public class Student {
 

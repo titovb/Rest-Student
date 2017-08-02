@@ -13,7 +13,6 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "GRADE")
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 public class Grade {
     @Id

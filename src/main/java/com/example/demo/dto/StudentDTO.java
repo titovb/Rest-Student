@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
  * Created by 1 on 25.07.2017.
  */
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 public class StudentDTO {
     private Long id;
