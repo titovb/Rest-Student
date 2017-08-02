@@ -36,7 +36,7 @@ public class GradeService {
     public GradeDTO addGrade(GradeDTO dto) {
         Grade saved = dao.save(convertDTOToEntity(dto));
         studentDAO.findOne(saved.getStudent().getId()).calculateAverageGrade();
-        log.info("GradeService - addGrade: added grade " + convertEntityToDTO(saved));
+        log.info("GradeService - addGrade: added grade " + convertEntityToDTO(saved)); // why u converting two times?
         return convertEntityToDTO(saved);
     }
 
@@ -48,7 +48,7 @@ public class GradeService {
 
     public GradeDTO updateGrade(GradeDTO dto) {
         Grade saved = dao.save(convertDTOToEntity(dto));
-        studentDAO.findOne(saved.getStudent().getId()).calculateAverageGrade();
+        studentDAO.findOne(saved.getStudent().getId()).calculateAverageGrade(); // here u calculating average grade for student after Grade was changed? It so why u don't save a student?
         log.info("GradeService - updateGrade: updated grade " + saved);
         return convertEntityToDTO(saved);
     }

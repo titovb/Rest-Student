@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
  * Created by 1 on 29.07.2017.
  */
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class GroupDTO {
     private Long id;

@@ -14,6 +14,7 @@ import java.util.List;
 @Entity
 @Table(name = "STUDENT_GROUP")
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class Group {
 

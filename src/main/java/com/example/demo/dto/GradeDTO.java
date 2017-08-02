@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
  * Created by 1 on 30.07.2017.
  */
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class GradeDTO {
     private Long id;

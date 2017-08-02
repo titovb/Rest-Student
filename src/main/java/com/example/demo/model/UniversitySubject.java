@@ -13,6 +13,7 @@ import java.util.List;
 @Entity
 @Table(name = "UNIVERSITY_SUBJECT")
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class UniversitySubject {
 

@@ -13,6 +13,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "GRADE")
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class Grade {
     @Id
@@ -21,7 +22,7 @@ public class Grade {
     private Long id;
 
     @Column(name = "DATE", nullable = false)
-    private LocalDate date;
+    private LocalDate date; // should be described what a date
 
     @Column(name = "VALUE", nullable = false)
     private Double value;
